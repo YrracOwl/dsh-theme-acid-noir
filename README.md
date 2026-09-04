@@ -8,7 +8,7 @@ Acid Noir is a selectable, usability-first cyber-editorial theme bundle for Deep
 
 Acid Noir 是面向 DeepSeek Harness Web 的可选择、重可用性的赛博编辑风格主题包，提供深色生产力主题、官方设置集成、可逆生命周期效果，并兼容 DSH 0.1.2 的 Client Store，同时保留旧版 runtime 回退。插件不会修改 Harness 文件，也不会在安装时强制切换主题。
 
-Acid Noir 0.4.1 is a **selectable, usability-first cyber editorial theme plugin** for DeepSeek Harness Web. It is a normal DSH bundle: no Harness source patching, no manual profile overlay, and no forced theme switch on installation.
+Acid Noir 0.4.2 is a **selectable, usability-first cyber editorial theme plugin** for DeepSeek Harness Web. It is a normal DSH bundle: no Harness source patching, no manual profile overlay, and no forced theme switch on installation.
 
 ## Themes
 
