@@ -1,0 +1,4 @@
+# Acid Noir selectable theme bundle.
+- insert:
+    - id: ui-theme-acid-noir
+      name: 'dsh-theme-acid-noir'

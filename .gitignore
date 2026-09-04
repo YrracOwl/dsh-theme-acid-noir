@@ -1,0 +1,12 @@
+node_modules/
+*.tgz
+.env
+.env.*
+.runtime/
+.dsh-*/
+artifacts/
+serve/
+.dsh-tmp-*
+*.zip
+*.mp4
+coverage/
