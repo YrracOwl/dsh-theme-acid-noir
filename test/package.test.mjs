@@ -6,7 +6,7 @@ const read = path => readFile(new URL(path, import.meta.url), 'utf8')
 test('package is a standalone DSH bundle', async () => {
   const pkg = JSON.parse(await read('../package.json'))
   assert.equal(pkg.name, 'dsh-theme-acid-noir')
-  assert.equal(pkg.version, '0.4.3')
+  assert.equal(pkg.version, '0.4.4')
   assert.equal(pkg.dsh.bundle.patch, './cordis.patch.yml')
   assert.equal(pkg.dsh.client.platform, 'web')
   assert.equal(pkg.dsh.client.immediately, true)
