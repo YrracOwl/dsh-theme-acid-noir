@@ -1,6 +1,6 @@
 {
   "name": "dsh-theme-acid-noir",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "EN: Usability-first cyber-editorial themes for DeepSeek Harness Web with reversible lifecycle effects. ZH: 面向 DeepSeek Harness Web、重视可用性并支持可逆生命周期效果的赛博编辑主题。",
   "type": "module",
   "main": "lib/index.js",
