@@ -25,6 +25,8 @@ This package is a selectable DSH theme bundle, not a shell replacement. It must 
 - Settings saves can make the official Theme Runtime re-adopt `light`/`dark`/`system`. Recover the still-selected custom theme, but never fight an explicit built-in or Default click.
 - Write browser preference intent before calling synchronous `ctx.theme.setTheme(id)`.
 - Use Theme tokens first and stable semantic selectors second. Do not style unrelated SSH, MCP, Pet, or plugin UI.
+- The composer attachment button is `button[aria-label][class*="_add"]` (ARIA label plus a class substring, never the module hash) and the queued-message banner is `div[data-queue-dock] > div[panel]`; `[data-dsh-part="queue-dock"]` does not exist in DSH and silently styled nothing.
+- Both components paint their own surface from `--dsw-specific-selector` / `--dsw-specific-tip`, so override the color rather than assuming those tokens match a label or layer token. `test/package.test.mjs` asserts WCAG contrast for both; keep it in sync when tokens change.
 
 ## Validation
 
