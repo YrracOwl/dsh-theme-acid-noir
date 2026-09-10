@@ -6,7 +6,7 @@ const read = path => readFile(new URL(path, import.meta.url), 'utf8')
 test('package is a standalone DSH bundle', async () => {
   const pkg = JSON.parse(await read('../package.json'))
   assert.equal(pkg.name, 'dsh-theme-acid-noir')
-  assert.equal(pkg.version, '0.4.4')
+  assert.equal(pkg.version, '0.4.5')
   assert.equal(pkg.dsh.bundle.patch, './cordis.patch.yml')
   assert.equal(pkg.dsh.client.platform, 'web')
   assert.equal(pkg.dsh.client.immediately, true)
@@ -70,9 +70,96 @@ test('all theme-owned effects are reversible', async () => {
 
 test('enhancements use stable DSH hooks and avoid unrelated plugins', async () => {
   const source = await read('../lib/client.js')
-  for (const selector of ['[data-composer-card]', '[data-tool]', '[data-variant="think"]', '[data-goal-bar]', '[data-chat-flow-key]', '[data-dsh-part="queue-dock"]']) {
+  for (const selector of ['[data-composer-card]', '[data-tool]', '[data-variant="think"]', '[data-goal-bar]', '[data-chat-flow-key]', '[data-queue-dock]']) {
     assert.ok(source.includes(selector), `missing ${selector}`)
   }
   assert.doesNotMatch(source, /dsh-mcp-pill|data-dsh-plugin="ssh"|data-dsh-plugin="pet"/)
   assert.doesNotMatch(source, /Persona 5|Atlus|Phantom Thieves/)
+})
+
+/**
+ * Relative luminance and WCAG contrast from a `#rgb`/`#rrggbb` literal — the
+ * same arithmetic the browser performs on the computed colors.
+ */
+function luminance(hex) {
+  let body = String(hex).replace('#', '')
+  if (body.length === 3) body = body.split('').map(c => c + c).join('')
+  const value = parseInt(body, 16)
+  const channels = [(value >> 16) & 255, (value >> 8) & 255, value & 255].map(c => {
+    const s = c / 255
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
+}
+
+function contrast(fg, bg) {
+  const a = luminance(fg)
+  const b = luminance(bg)
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
+}
+
+/** Read one `const NAME = { ... }` token table. */
+function tokenTable(source, name) {
+  const head = new RegExp(`const ${name} = \\{`).exec(source)
+  if (head === null) throw new Error(`token table ${name} not found`)
+  const open = source.indexOf('{', head.index)
+  let depth = 0
+  let end = open
+  for (let i = open; i < source.length; i++) {
+    if (source[i] === '{') depth += 1
+    else if (source[i] === '}') {
+      depth -= 1
+      if (depth === 0) { end = i; break }
+    }
+  }
+  const tokens = {}
+  const pair = /'(--[a-z0-9-]+)':\s*'(#[0-9a-fA-F]{3,8})'/g
+  let match
+  while ((match = pair.exec(source.slice(open + 1, end))) !== null) tokens[match[1]] = match[2]
+  // `SIGNAL` and other variants spread a base table, so resolve the spread or
+  // the variant only carries its own overrides.
+  const spread = /\.\.\.([A-Z][A-Z0-9_]*)/.exec(source.slice(open + 1, end))
+  if (spread !== null) return { ...tokenTable(source, spread[1]), ...tokens }
+  return tokens
+}
+
+test('composer attachment button and queued-message dock stay readable', async () => {
+  const source = await read('../lib/client.js')
+
+  // DSH renders the queue banner as div[data-queue-dock] > div[panel]; the
+  // previous [data-dsh-part="queue-dock"] selector matched nothing at all.
+  assert.match(source, /\[data-queue-dock\] > div \{/)
+  assert.doesNotMatch(source, /data-dsh-part="queue-dock"/)
+
+  // The attachment button glyph must not depend on a CSS-module class hash.
+  assert.match(source, /button\[aria-label\]\[class\*="_add"\]/)
+  assert.doesNotMatch(source, /\.uV2eYG_add|\._7yHdaG_/)
+
+  for (const [label, table, accentRule] of [
+    ['acid-noir', 'BASE', "body\\[data-acid-noir\\] \\{"],
+    ['acid-noir-signal', 'SIGNAL', 'body\\[data-acid-noir="signal"\\] \\{'],
+  ]) {
+    const tokens = tokenTable(source, table)
+
+    // `--an-accent` is declared by the CSS layer's body rule, not by the token
+    // table: read the literal the variant actually paints with.
+    const rule = new RegExp(accentRule).exec(source)
+    assert.ok(rule, `${label}: body rule missing`)
+    const accentMatch = /--an-accent\s*:\s*(#[0-9a-fA-F]{3,8})/.exec(source.slice(rule.index, rule.index + 160))
+    assert.ok(accentMatch, `${label}: --an-accent missing from the body rule`)
+    const accent = accentMatch[1]
+
+    // The component paints the button with --dsw-specific-selector; this theme
+    // overrides it through the CSS layer with --dsw-alias-bg-layer-1.
+    const pairs = [
+      ['queue banner count/rows', tokens['--dsw-alias-label-primary'], tokens['--dsw-alias-bg-layer-1']],
+      ['queue banner lead icon', tokens['--dsw-alias-label-tertiary'], tokens['--dsw-alias-bg-layer-1']],
+      ['attachment button glyph', tokens['--dsw-alias-label-primary'], tokens['--dsw-alias-bg-layer-1']],
+      ['attachment button hover glyph', accent, tokens['--dsw-alias-interactive-bg-hover-solid']],
+    ]
+    for (const [what, fg, bg] of pairs) {
+      const ratio = contrast(fg, bg)
+      assert.ok(ratio >= 4.5, `${label}: ${what} is ${ratio.toFixed(2)}:1 (${fg} on ${bg})`)
+    }
+  }
 })

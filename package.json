@@ -1,7 +1,7 @@
 {
   "name": "dsh-theme-acid-noir",
-  "version": "0.4.4",
-  "description": "EN: Usability-first cyber-editorial themes for DeepSeek Harness Web with reversible lifecycle effects. ZH: 面向 DeepSeek Harness Web、重视可用性并支持可逆生命周期效果的赛博编辑主题。",
+  "version": "0.4.5",
+  "description": "EN: Usability-first cyber-editorial themes for DeepSeek Harness Web with reversible lifecycle effects. 0.4.5 restyles the composer attachment button and the queued-message dock. ZH: 面向 DeepSeek Harness Web、重视可用性并支持可逆生命周期效果的赛博编辑主题。0.4.5 适配输入框附件按钮与排队消息面板。",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

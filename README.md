@@ -8,7 +8,7 @@ Acid Noir is a selectable, usability-first cyber-editorial theme bundle for Deep
 
 Acid Noir 是面向 DeepSeek Harness Web 的可选择、重可用性的赛博编辑风格主题包，提供深色生产力主题、官方设置集成、可逆生命周期效果，并兼容 DSH 0.1.2 的 Client Store，同时保留旧版 runtime 回退。插件不会修改 Harness 文件，也不会在安装时强制切换主题。
 
-Acid Noir 0.4.4 is a **selectable, usability-first cyber editorial theme plugin** for DeepSeek Harness Web. It is a normal DSH bundle: no Harness source patching, no manual profile overlay, and no forced theme switch on installation.
+Acid Noir 0.4.5 is a **selectable, usability-first cyber editorial theme plugin** for DeepSeek Harness Web. It is a normal DSH bundle: no Harness source patching, no manual profile overlay, and no forced theme switch on installation.
 
 ## Themes
 
@@ -34,16 +34,18 @@ Choose the skin in **Settings → General → Acid Noir theme**. The selection i
 ## Install
 
 ```powershell
-dsh plugin --profile web add .
-```
-
-For a published package:
-
-```powershell
 dsh plugin --profile web add dsh-theme-acid-noir
 ```
 
-Restart `dsh web` after the first installation so the Host discovers the new client bundle. Subsequent local client edits are visible through the existing client-plugin HMR receiver when the bundle route revision updates; otherwise refresh the page.
+Restart the existing DSH Web process afterwards: the Host scans the browser plugin roster at startup, so the theme rows appear only after that restart. Then open **Settings → General → Acid Noir theme**.
+
+Local development, from this package directory:
+
+```powershell
+dsh plugin --profile web add .
+```
+
+Either form records the package in the profile's `dsh.profile.bundles`, which is what serves the client bundle. After the first installation, restart `dsh web` so the Host discovers the bundle; later local client edits become visible through the existing client-plugin HMR receiver when the bundle route revision updates, otherwise refresh the page.
 
 ## Uninstall
 
