@@ -6,7 +6,7 @@ const read = path => readFile(new URL(path, import.meta.url), 'utf8')
 test('package is a standalone DSH bundle', async () => {
   const pkg = JSON.parse(await read('../package.json'))
   assert.equal(pkg.name, 'dsh-theme-acid-noir')
-  assert.equal(pkg.version, '0.4.5')
+  assert.equal(pkg.version, '0.4.6')
   assert.equal(pkg.dsh.bundle.patch, './cordis.patch.yml')
   assert.equal(pkg.dsh.client.platform, 'web')
   assert.equal(pkg.dsh.client.immediately, true)
@@ -122,6 +122,27 @@ function tokenTable(source, name) {
   if (spread !== null) return { ...tokenTable(source, spread[1]), ...tokens }
   return tokens
 }
+
+test('only design tokens the host actually declares are referenced', async () => {
+  const source = await read('../lib/client.js')
+
+  // `--dsw-mono-family` never existed in the host token set; the monospace family
+  // is `--dsw-font-mono` (declared by dsh-client-ui-jobs and
+  // dsh-client-ui-agent-preset on the 0.2.1 line). Referencing a name the host
+  // does not define silently falls through to the fallback stack, so the theme
+  // looks correct only by accident and loses the host's own font choice.
+  assert.doesNotMatch(source, /--dsw-mono-family/)
+  const monoUses = [...source.matchAll(/var\((--dsw-[a-z0-9-]+)/g)].map((m) => m[1])
+  assert.ok(monoUses.includes('--dsw-font-mono'), 'the mono family token must be the host-declared one')
+
+  // Guard the rest of the referenced tokens against the same class of typo: every
+  // `--dsw-*` name this bundle reads must appear in the host's token table too.
+  // Kept as a denylist of the shapes that cannot exist rather than an allowlist,
+  // because the host adds alias tokens between releases.
+  for (const stale of ['--dsw-mono-family', '--dsw-font-family-mono', '--dsw-code-font']) {
+    assert.doesNotMatch(source, new RegExp(stale), `${stale} is not a host token`)
+  }
+})
 
 test('composer attachment button and queued-message dock stay readable', async () => {
   const source = await read('../lib/client.js')
