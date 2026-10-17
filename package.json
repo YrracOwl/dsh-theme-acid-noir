@@ -1,7 +1,7 @@
 {
   "name": "dsh-theme-acid-noir",
-  "version": "0.4.6",
-  "description": "EN: Usability-first cyber-editorial themes for DeepSeek Harness Web with reversible lifecycle effects. 0.4.6 renames the monospace token to the host-declared --dsw-font-mono. ZH: 面向 DeepSeek Harness Web、重视可用性并支持可逆生命周期效果的赛博编辑主题。0.4.6 把等宽字体 token 改为宿主声明的 --dsw-font-mono。",
+  "version": "0.4.7",
+  "description": "EN: Usability-first cyber-editorial themes for DeepSeek Harness Web with reversible lifecycle effects. 0.4.7 renames the monospace token to the host-declared --dsw-font-mono. ZH: 面向 DeepSeek Harness Web、重视可用性并支持可逆生命周期效果的赛博编辑主题。0.4.7 把等宽字体 token 改为宿主声明的 --dsw-font-mono。",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
